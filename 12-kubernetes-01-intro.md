@@ -20,6 +20,29 @@
 - после запуска стоит проверить статус: minikube status
 - запущенные служебные компоненты можно увидеть командой: kubectl get pods --namespace=kube-system
 
+Ответ: Пришлось дополнительно установить crictl для запуска minikube без драйвера https://github.com/kubernetes-sigs/cri-tools
+
+```
+# minikube status
+minikube
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+# kubectl get pods --namespace=kube-system
+NAME                                           READY   STATUS    RESTARTS        AGE
+coredns-565d847f94-gtclf                       0/1     Pending   0               6m21s
+etcd-fhmqi6mdvhdfd1mcjs51                      1/1     Running   2 (4m27s ago)   6m33s
+kube-apiserver-fhmqi6mdvhdfd1mcjs51            1/1     Running   2 (4m20s ago)   6m34s
+kube-controller-manager-fhmqi6mdvhdfd1mcjs51   1/1     Running   2 (4m20s ago)   6m33s
+kube-proxy-9kw6d                               1/1     Running   2 (4m27s ago)   6m21s
+kube-scheduler-fhmqi6mdvhdfd1mcjs51            1/1     Running   2 (4m18s ago)   6m33s
+storage-provisioner                            0/1     Pending   0               6m30s
+
+```
+
 ### Для сброса кластера стоит удалить кластер и создать заново:
 - minikube delete
 - minikube start --vm-driver=none
@@ -36,11 +59,39 @@
 - развернуть через Minikube тестовое приложение по [туториалу](https://kubernetes.io/ru/docs/tutorials/hello-minikube/#%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5-%D0%BA%D0%BB%D0%B0%D1%81%D1%82%D0%B5%D1%80%D0%B0-minikube)
 - установить аддоны ingress и dashboard
 
+Ответ:
+
+Нужно использовать докер драйвер, чтобы все корректно развернулось. 
+Для этого используем minikube start с учетной записи, где на docker выданы полные права.
+
+```
+$ kubectl get deployments
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+hello-node   1/1     1            1           2m7s
+
+$ minikube addons list | grep enabled
+| dashboard                   | minikube | enabled ✅   | Kubernetes                     |
+| default-storageclass        | minikube | enabled ✅   | Kubernetes                     |
+| ingress                     | minikube | enabled ✅   | Kubernetes                     |
+| storage-provisioner         | minikube | enabled ✅   | Google                         |
+
+```
+
 ## Задача 3: Установить kubectl
 
 Подготовить рабочую машину для управления корпоративным кластером. Установить клиентское приложение kubectl.
 - подключиться к minikube 
 - проверить работу приложения из задания 2, запустив port-forward до кластера
+
+Ответ:
+
+<img src="screenshots/portforward.png">
+
+```
+$ kubectl port-forward service/hello-node 8080:8080 --address=0.0.0.0
+Forwarding from 0.0.0.0:8080 -> 8080
+Handling connection for 8080
+```
 
 ## Задача 4 (*): собрать через ansible (необязательное)
 
