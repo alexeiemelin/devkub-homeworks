@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frontend
+  name: frontend
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: frontend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: legioownage/frontend
+        imagePullPolicy: IfNotPresent
+        name: frontend
+        env:
+          - name: BASE_URL
+            value: http://backend:9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: frontend
+  name: frontend
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - name: frontend
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: frontend
