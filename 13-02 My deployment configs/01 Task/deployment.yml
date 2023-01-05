@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: apps
+  name: apps
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: apps
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: apps
+    spec:
+      containers:
+      - image: legioownage/backend
+        imagePullPolicy: IfNotPresent
+        name: backend
+        volumeMounts:
+          - mountPath: "/static"
+            name: my-volume
+      - image: legioownage/frontend
+        imagePullPolicy: IfNotPresent
+        name: frontend
+        volumeMounts:
+          - mountPath: "/tmp/cache"
+            name: my-volume
+      volumes:
+        - name: my-volume
+          emptyDir: {}
